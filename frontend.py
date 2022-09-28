@@ -25,7 +25,7 @@ def upload_image():
         colors = colorPallete(os.path.join(
             basedir, app.config["IMAGE_UPLOADS"], filename))
         print(colors)
-        return render_template("index.html", filename=filename)
+        return render_template("index.html", filename=filename, colors=colors)
 
     return render_template('index.html')
 
