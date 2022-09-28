@@ -1,7 +1,7 @@
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, redirect, url_for
 import os
-from main import *
+from functions import *
 
 app = Flask(__name__)
 
