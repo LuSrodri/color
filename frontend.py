@@ -2,6 +2,8 @@ from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, redirect, url_for
 import os
 from functions import *
+import numpy as np
+
 
 app = Flask(__name__)
 
@@ -25,7 +27,16 @@ def upload_image():
         colors = colorPallete(os.path.join(
             basedir, app.config["IMAGE_UPLOADS"], filename))
         print(colors)
-        return render_template("index.html", filename=filename, colors=colors)
+        low_green = np.array([25, 52, 72])
+        high_green = np.array([102, 255, 255])
+        mask = creatingMask(os.path.join(
+            basedir, app.config["IMAGE_UPLOADS"], filename),low_green,high_green)
+
+        image.save(os.path.join(
+            basedir, app.config["IMAGE_UPLOADS"], mask))
+
+        print("mask = ",mask)
+        return render_template("index.html", filename=filename, colors=colors,mask=mask)
 
     return render_template('index.html')
 
