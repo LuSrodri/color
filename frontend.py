@@ -22,21 +22,26 @@ def upload_image():
         filename = secure_filename(image.filename)
 
         basedir = os.path.abspath(os.path.dirname(__file__))
-        image.save(os.path.join(
-            basedir, app.config["IMAGE_UPLOADS"], filename))
-        colors = colorPallete(os.path.join(
-            basedir, app.config["IMAGE_UPLOADS"], filename))
-        print(colors)
+
+        absolute_path = os.path.join(
+            basedir, app.config["IMAGE_UPLOADS"], filename)
+
+        # salvando imagem principal
+        image.save(absolute_path)
+
+        # coletando paleta de cores
+        colors = colorPallete(absolute_path)
+
         low_green = np.array([25, 52, 72])
         high_green = np.array([102, 255, 255])
-        mask = creatingMask(os.path.join(
-            basedir, app.config["IMAGE_UPLOADS"], filename),low_green,high_green)
 
-        image.save(os.path.join(
-            basedir, app.config["IMAGE_UPLOADS"], mask))
+        # criando mascara
+        mask = creatingMask(absolute_path, low_green, high_green)
 
-        print("mask = ",mask)
-        return render_template("index.html", filename=filename, colors=colors,mask=mask)
+        # aplicando mascara e salvando a imagem de resposta
+        responseImage(absolute_path, mask)
+
+        return render_template("index.html", filename=filename, colors=colors, mask='mask.jpg', response='response.jpg')
 
     return render_template('index.html')
 
