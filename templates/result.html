@@ -1,18 +1,28 @@
 <html>
 <head>
-    <title>Processamento de Sinais</title>
+    <title>Resultados</title>
    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link rel="stylesheet" href="../static/css/index.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
-<form method="post" action="/home" enctype="multipart/form-data">
-		<p>
-			<input type="file" name="file" autocomplete="off" required>
-		</p>
+    {% if filename %}
+	<div>
+		<img src="{{ url_for('static', filename='/Images/'+filename) }}">
+	</div>
+	<p>{{colors}}</p>
+
+	{% if mask %}
+	<img src="{{ url_for('static', filename='/Images/'+mask) }}">
+	{% endif %}
+	{% if response %}
+	<img src="{{ url_for('static', filename='/Images/'+response) }}">
+	{% endif %}
+{% endif %}
+<form method="get" action="/home" enctype="multipart/form-data">
     <p>
-		<input type="submit" value="Submit">
+		<input type="submit" value="Voltar">
 	</p>
 </form>
     

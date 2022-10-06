@@ -9,6 +9,9 @@ app = Flask(__name__)
 
 app.config['IMAGE_UPLOADS'] = 'static\images'
 
+filename = 0
+absolute_path = 0
+
 
 @app.route('/home', methods=["GET", "POST"])
 def upload_image():
@@ -18,11 +21,11 @@ def upload_image():
         if image.filename == '':
             print("Image must have a file name")
             return redirect(request.url)
-
+        global filename
         filename = secure_filename(image.filename)
 
         basedir = os.path.abspath(os.path.dirname(__file__))
-
+        global absolute_path
         absolute_path = os.path.join(
             basedir, app.config["IMAGE_UPLOADS"], filename)
 
@@ -35,13 +38,38 @@ def upload_image():
         low_green = np.array([25, 52, 72])
         high_green = np.array([102, 255, 255])
 
+        return render_template("colorPallete.html", filename=filename, colors=colors)
+
+    return render_template('index.html')
+
+
+@app.route('/color', methods=["GET", "POST"])
+def get_colors():
+    if request.method == "POST":
+        image = request.files['file']
+
+        # coletando paleta de cores
+        colors = colorPallete(absolute_path)
+
+        return render_template("colorPallete.html", filename=filename, colors=colors)
+
+    return render_template('index.html')
+
+
+@app.route('/result', methods=["GET", "POST"])
+def results():
+    if request.method == "POST":
+
+        low_green = np.array([25, 52, 72])
+        high_green = np.array([102, 255, 255])
+
         # criando mascara
         mask = creatingMask(absolute_path, low_green, high_green)
 
         # aplicando mascara e salvando a imagem de resposta
         responseImage(absolute_path, mask)
 
-        return render_template("index.html", filename=filename, colors=colors, mask='mask.jpg', response='response.jpg')
+        return render_template("result.html", filename=filename, mask='mask.jpg', response='response.jpg')
 
     return render_template('index.html')
 
