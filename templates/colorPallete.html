@@ -1,16 +1,24 @@
 <html>
 <head>
-    <title>Processamento de Sinais</title>
+    <title>Cores</title>
    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link rel="stylesheet" href="../static/css/index.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
-<form method="post" action="/home" enctype="multipart/form-data">
-		<p>
-			<input type="file" name="file" autocomplete="off" required>
-		</p>
+    {% if filename %}
+	<div>
+		<img src="{{ url_for('static', filename='/Images/'+filename) }}">
+	</div>
+{% endif %}
+<form method="post" action="/result" enctype="multipart/form-data">
+    <button class="color">{{colors[0]}}</button>
+	<button class="color">{{colors[1]}}</button>
+	<button class="color">{{colors[2]}}</button>
+	<button class="color">{{colors[3]}}</button>
+	<button class="color">{{colors[4]}}</button>
+	<button class="color">{{colors[5]}}</button>
     <p>
 		<input type="submit" value="Submit">
 	</p>
