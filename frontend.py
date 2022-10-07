@@ -62,15 +62,15 @@ def get_colors():
 def results():
     if request.method == "POST":
         color = request.form.get('color').split(',')
-        hsvColor = colorsys.rgb_to_hsv(
-            int(color[0]), int(color[1]), int(color[2]))
-        print(hsvColor)
-        print(hsvColor[0])
-        print(hsvColor[1])
-        print(hsvColor[2])
+        # hsvColor = colorsys.rgb_to_hsv(
+        #     int(color[0]), int(color[1]), int(color[2]))
+        # print(hsvColor)
+        # print(hsvColor[0])
+        # print(hsvColor[1])
+        # print(hsvColor[2])
         low = np.array(
-            [int(hsvColor[0]), int(hsvColor[1]), int(hsvColor[2])-100])
-        high = np.array([int(hsvColor[0]), int(hsvColor[1]), int(hsvColor[2])])
+            [0, 0, 0])
+        high = np.array([int(color[0]), int(color[1]), int(color[2])])
         low_green = np.array([25, 52, 72])
         high_green = np.array([102, 255, 255])
         print()
@@ -80,11 +80,21 @@ def results():
         print("high_green = ", high_green)
 
         # criando mascara
-        mask = creatingMask(absolute_path, low_green, high_green)
+        mask = creatingMask(absolute_path, low, high)
 
         # aplicando mascara e salvando a imagem de resposta
         responseImage(absolute_path, mask)
 
+        return render_template("result.html", filename=filename, mask='mask.jpg', response='response.jpg')
+
+    return render_template('index.html')
+
+
+@app.route('/removeColor', methods=["GET", "POST"])
+def removeColor():
+    if request.method == "POST":
+        color = request.form.get('color').split(',')
+        removeSpecificColor(absolute_path, color)
         return render_template("result.html", filename=filename, mask='mask.jpg', response='response.jpg')
 
     return render_template('index.html')

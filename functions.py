@@ -1,6 +1,7 @@
 from colorthief import ColorThief
 import matplotlib.pyplot as plot
 import cv2
+from PIL import Image
 
 
 def colorPallete(fileaddress):
@@ -31,3 +32,17 @@ def responseImage(filename, mask):
     res = cv2.bitwise_and(img, img, mask=mask)
 
     cv2.imwrite('static/images/response.jpg', res)
+
+
+def removeSpecificColor(filename, color):
+    print(filename)
+    print(color)
+    image = Image.open(filename).convert('RGB')
+    image_data = image.load()
+    height, width = image.size
+    for loop1 in range(height):
+        for loop2 in range(width):
+            r, g, b = image_data[loop1, loop2]
+            if r in range(int(color[0])-5, int(color[0])+5) and g in range(int(color[1])-5, int(color[1])+5) and b in range(int(color[2])-5, int(color[2])+5):
+                image_data[loop1, loop2] = 0, 0, 0
+    image.save('static/images/response.jpg')
