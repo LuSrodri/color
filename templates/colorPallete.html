@@ -19,9 +19,6 @@
 		<div id="color" style="display: flex; flex-direction: row;">
 
 		</div>
-		<p>
-			<input type="submit" value="Submit">
-		</p>
 	</form>
 
 
@@ -40,12 +37,19 @@
 <script>
 	let colorsElement = document.getElementsByClassName("color");
 	colorsData = {{colors | tojson}};
-	console.log(colorsData);
+
 	for (let i = 0; i < colorsData.length; i++) {
-		colorsElement = document.createElement("div");
+		colorsElement = document.createElement("button");
 		colorsElement.style.width = "10vmin";
 		colorsElement.style.height = "10vmin";
 		colorsElement.style.backgroundColor = 'rgb(' + colorsData[i][0] + ',' + colorsData[i][1] + ',' + colorsData[i][2]  + ')';
+		colorsElement.addEventListener('click',(e)=>{
+			console.log(colorsElement.getAttribute("color"));
+		})
+		colorsElement.setAttribute("type","submit")
+		colorsElement.setAttribute("name","color")
+		colorsElement.setAttribute("value",colorsData[i])
+
 		document.getElementById("color").appendChild(colorsElement);
 	}
 
