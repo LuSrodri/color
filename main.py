@@ -3,7 +3,6 @@ import numpy as np
 from tkinter import filedialog
 from colorthief import ColorThief
 import matplotlib.pyplot as plot
-import sys
 from tkinter import *
 low_green = np.array([25, 52, 72])
 high_green = np.array([102, 255, 255])
