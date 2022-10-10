@@ -103,6 +103,3 @@ def removeColor():
 @app.route('/display/<filename>')
 def display_image(filename):
     return redirect(url_for('static', filename='/images/' + filename), code=301)
-
-
-app.run()

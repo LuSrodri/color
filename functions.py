@@ -44,5 +44,5 @@ def removeSpecificColor(filename, color):
         for loop2 in range(width):
             r, g, b = image_data[loop1, loop2]
             if r in range(int(color[0])-5, int(color[0])+5) and g in range(int(color[1])-5, int(color[1])+5) and b in range(int(color[2])-5, int(color[2])+5):
-                image_data[loop1, loop2] = 0, 0, 0
+                image_data[loop1, loop2] = 255, 255, 255
     image.save('static/images/response.jpg')
