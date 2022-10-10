@@ -88,8 +88,8 @@ def removeColor():
     if request.method == "POST":
         color = request.form.get('color').split(',')
         print(color)
-        removeSpecificColor(absolute_path, color)
-        return render_template("result.html", filename=filename, response='response.jpg')
+        totalPixels,specificColor = removeSpecificColor(absolute_path, color)
+        return render_template("result.html", filename=filename, response='response.jpg', totalPixels=totalPixels, specificColor=specificColor, color=color)
 
     return render_template('index.html')
 

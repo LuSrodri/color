@@ -41,16 +41,36 @@ def removeSpecificColor(filename, color):
     image_data = image.load()
     height, width = image.size
 
+    totalPixels = 0
+    specificColor = 0
+
     if (len(color) == 3):
         for loop1 in range(height):
             for loop2 in range(width):
+                totalPixels += 1
                 r, g, b = image_data[loop1, loop2]
                 if r in range(int(color[0])-5, int(color[0])+5) and g in range(int(color[1])-5, int(color[1])+5) and b in range(int(color[2])-5, int(color[2])+5):
+                    specificColor+=1
                     image_data[loop1, loop2] = 0, 0, 0
 
     elif (color[0] == 'red'):
         for loop1 in range(height):
             for loop2 in range(width):
+                totalPixels += 1
                 r, g, b = image_data[loop1, loop2]
                 image_data[loop1, loop2] = 0, g, b
+    
+    elif (color[0] == 'green'):
+        for loop1 in range(height):
+            for loop2 in range(width):
+                totalPixels += 1
+                r, g, b = image_data[loop1, loop2]
+                image_data[loop1, loop2] = r, 0, b
+
+    elif (color[0] == 'blue'):
+        for loop1 in range(height):
+            for loop2 in range(width):
+                r, g, b = image_data[loop1, loop2]
+                image_data[loop1, loop2] = r, g, 0
     image.save('static/images/response.jpg')
+    return totalPixels,specificColor

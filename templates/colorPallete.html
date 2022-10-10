@@ -16,13 +16,15 @@
 	</div>
 	{% endif %}
 	<form method="post" action="/removeColor" enctype="multipart/form-data">
+		<h1>Cores Principais</h1>
 		<div id="color" style="display: flex; flex-direction: row;">
 
 		</div>
 		<div>
-			<button name="color" value="red">red</button>
-			<button name="color" value="green">green</button>
-			<button name="color" value="blue">blue</button>
+			<h1>Filtrar Cores</h1>
+			<button name="color" style="background-color: rgb(255,0,0);" value="red">red</button>
+			<button name="color" style="background-color: rgb(0,255,0);" value="green">green</button>
+			<button name="color"style="background-color: rgb(0,0,255);" value="blue">blue</button>
 		</div>
 	</form>
 

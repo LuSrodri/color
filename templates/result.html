@@ -9,9 +9,14 @@
 <body>
     {% if filename %}
 	<div>
+		<h1>Essa imagem possui {{totalPixels}} Pixels</h1>
+	</div>
+	<div>
+		<h1> {{specificColor}} Pixels são da cor {{color}}</h1>
+	</div>
+	<div style="margin-bottom: 10px;">
 		<img src="{{ url_for('static', filename='/Images/'+filename) }}">
 	</div>
-	<p>{{colors}}</p>
 
 	{% if mask %}
 	<img src="{{ url_for('static', filename='/Images/'+mask) }}">
