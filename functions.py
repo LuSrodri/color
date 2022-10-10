@@ -1,5 +1,4 @@
 from colorthief import ColorThief
-import matplotlib.pyplot as plot
 import cv2
 from PIL import Image
 

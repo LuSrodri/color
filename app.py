@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, redirect, url_for
 import os
 from functions import *
 import numpy as np
-import colorsys
 
 
 app = Flask(__name__)
