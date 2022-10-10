@@ -6,7 +6,7 @@ from PIL import Image
 
 def colorPallete(fileaddress):
     ct = ColorThief(fileaddress)
-    total = 6
+    total = 2
     palette = list(set(ct.get_palette(color_count=total)))
     return palette
 
@@ -40,9 +40,17 @@ def removeSpecificColor(filename, color):
     image = Image.open(filename).convert('RGB')
     image_data = image.load()
     height, width = image.size
-    for loop1 in range(height):
-        for loop2 in range(width):
-            r, g, b = image_data[loop1, loop2]
-            if r in range(int(color[0])-5, int(color[0])+5) and g in range(int(color[1])-5, int(color[1])+5) and b in range(int(color[2])-5, int(color[2])+5):
-                image_data[loop1, loop2] = 255, 255, 255
+
+    if (len(color) == 3):
+        for loop1 in range(height):
+            for loop2 in range(width):
+                r, g, b = image_data[loop1, loop2]
+                if r in range(int(color[0])-5, int(color[0])+5) and g in range(int(color[1])-5, int(color[1])+5) and b in range(int(color[2])-5, int(color[2])+5):
+                    image_data[loop1, loop2] = 0, 0, 0
+
+    elif (color[0] == 'red'):
+        for loop1 in range(height):
+            for loop2 in range(width):
+                r, g, b = image_data[loop1, loop2]
+                image_data[loop1, loop2] = 0, g, b
     image.save('static/images/response.jpg')

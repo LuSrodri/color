@@ -71,13 +71,6 @@ def results():
         low = np.array(
             [0, 0, 0])
         high = np.array([int(color[0]), int(color[1]), int(color[2])])
-        low_green = np.array([25, 52, 72])
-        high_green = np.array([102, 255, 255])
-        print()
-        print("low = ", low)
-        print("high = ", high)
-        print("low_green = ", low_green)
-        print("high_green = ", high_green)
 
         # criando mascara
         mask = creatingMask(absolute_path, low, high)
@@ -94,8 +87,9 @@ def results():
 def removeColor():
     if request.method == "POST":
         color = request.form.get('color').split(',')
+        print(color)
         removeSpecificColor(absolute_path, color)
-        return render_template("result.html", filename=filename, mask='mask.jpg', response='response.jpg')
+        return render_template("result.html", filename=filename, response='response.jpg')
 
     return render_template('index.html')
 
