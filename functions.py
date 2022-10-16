@@ -1,77 +1,92 @@
-from colorthief import ColorThief
-import matplotlib.pyplot as plot
 import cv2
 from PIL import Image
+from sklearn.cluster import KMeans 
+import imutils 
+import numpy as np
+from colorthief import ColorThief
+import extcolors
 
+def colorPaletteByKmeans(image, clusterNumber):
+    # a function to get the color palette of an image and return it as a list with the RGB values and the percentage of each color
+    image = cv2.imread(image)
+    image = imutils.resize(image, height=200)
 
-def colorPallete(fileaddress):
-    ct = ColorThief(fileaddress)
-    total = 11
-    palette = list(set(ct.get_palette(color_count=total)))
+    flat_img = np.reshape(image, (-1,3))
+
+    kmeans = KMeans(n_clusters=clusterNumber, random_state=0)
+    kmeans.fit(flat_img)
+
+    dominant_colors = np.array(kmeans.cluster_centers_, dtype='uint')
+
+    percentages = (np.unique(kmeans.labels_, return_counts=True)[1])/flat_img.shape[0]
+    p_and_c = zip(percentages, dominant_colors)
+    p_and_c = sorted(p_and_c, reverse=True)
+
+    for i in range(len(p_and_c)):
+        p_and_c[i] = list(p_and_c[i])
+        p_and_c[i][1] = p_and_c[i][1].tolist()
+
+    return p_and_c
+
+def colorPaletteByColorThief(image, number_of_colors):
+    ct = ColorThief(image)
+    palette = list(set(ct.get_palette(color_count=number_of_colors, quality=1)))
+    dominant_color = ct.get_color(quality=1)
+
+    palette.insert(0, dominant_color)
+
     return palette
 
+def colorPaletteByExtColor(image, number_of_colors):
+    colors, pixel_count = extcolors.extract_from_path(image, 25, number_of_colors)
+    percentages = getPercentagesOfColorsByPixel(pixel_count, colors)
 
-def creatingMask(filename, low, high):
-    img = cv2.imread(filename)
-    img = cv2.resize(img, (900, 650), interpolation=cv2.INTER_CUBIC)
+    p_and_c = zip(percentages, colors)
+    p_and_c = sorted(p_and_c, reverse=True)
 
-    # convert BGR to HSV
-    imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    # create the Mask
-    mask = cv2.inRange(imgHSV, low, high)
-    mask = 255-mask
+    for i in range(len(p_and_c)):
+        p_and_c[i] = list(p_and_c[i])
+        p_and_c[i][1] = list(p_and_c[i][1])
 
-    cv2.imwrite('static/images/mask.jpg', mask)
+    return p_and_c
 
-    return mask
-
-
-def responseImage(filename, mask):
-    img = cv2.imread(filename)
-    img = cv2.resize(img, (900, 650), interpolation=cv2.INTER_CUBIC)
-    res = cv2.bitwise_and(img, img, mask=mask)
-
-    cv2.imwrite('static/images/response.jpg', res)
-
+def getPercentagesOfColorsByPixel(pixel_count, colors):
+    percentages = []
+    for i in range(len(colors)):
+        percentages.append(colors[i][1]/pixel_count*100)
+    return percentages
 
 def removeSpecificColor(filename, color):
-    print(filename)
-    print(color)
-    image = Image.open(filename).convert('RGB')
+    image = Image.open('static/images/one.jpg').convert('RGB')
     image_data = image.load()
     height, width = image.size
 
-    totalPixels = 0
-    specificColor = 0
-    rangePixel = 85
+    rangePixel = 50
 
-    if (len(color) == 3):
+    if (len(color) == 3 and isinstance(color[0],int)):
+        for i in range(len(color)):
+            for loop1 in range(height):
+                for loop2 in range(width):
+                    r, g, b = image_data[loop1, loop2]
+                    if r in range(int(color[0])-rangePixel, int(color[0])+rangePixel) and g in range(int(color[1])-rangePixel, int(color[1])+rangePixel) and b in range(int(color[2])-rangePixel, int(color[2])+rangePixel):
+                        image_data[loop1, loop2] = 255, 255, 255
+
+    if (color == 'red'):
         for loop1 in range(height):
             for loop2 in range(width):
-                totalPixels += 1
-                r, g, b = image_data[loop1, loop2]
-                if r in range(int(color[0])-rangePixel, int(color[0])+rangePixel) and g in range(int(color[1])-rangePixel, int(color[1])+rangePixel) and b in range(int(color[2])-rangePixel, int(color[2])+rangePixel):
-                    specificColor+=1
-                    image_data[loop1, loop2] = 255, 255, 255
-
-    elif (color[0] == 'red'):
-        for loop1 in range(height):
-            for loop2 in range(width):
-                totalPixels += 1
                 r, g, b = image_data[loop1, loop2]
                 image_data[loop1, loop2] = 0, g, b
-    
-    elif (color[0] == 'green'):
+
+    elif (color == 'green'):
         for loop1 in range(height):
             for loop2 in range(width):
-                totalPixels += 1
                 r, g, b = image_data[loop1, loop2]
                 image_data[loop1, loop2] = r, 0, b
 
-    elif (color[0] == 'blue'):
+    elif (color == 'blue'):
         for loop1 in range(height):
             for loop2 in range(width):
                 r, g, b = image_data[loop1, loop2]
                 image_data[loop1, loop2] = r, g, 0
+
     image.save('static/images/response.jpg')
-    return totalPixels,specificColor
