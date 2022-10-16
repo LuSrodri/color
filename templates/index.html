@@ -121,12 +121,16 @@
       <h2>Remover canal de cores</h2>
       <div class="divColors">
         <button id="red" class="channelColor" style="background-color: red;"><span class="button">red</span></button>
-        <button id="green" class="channelColor" style="background-color: green;"><span class="button">green</span></button>
+        <button id="green" class="channelColor" style="background-color: green;"><span
+            class="button">green</span></button>
         <button id="blue" class="channelColor" style="background-color: blue;"><span class="button">blue</span></button>
       </div>
       <hr>
       <button class="btn btn-dark btn-block" onclick="sendColorRequest(colorsRequest)">
         <h3 style="font-size: 4vmin;">Processar imagem</h3>
+      </button>
+      <button class="btn btn-light btn-block" onclick="sendRemoveBg()">
+        <h3 style="font-size: 4vmin;">Remover fundo</h3>
       </button>
     </div>
 
@@ -326,6 +330,27 @@
     document.getElementById("image").scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  async function sendRemoveBg() {
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      imageResult.src = e.target.result;
+      image.style.display = "none";
+      imageResult.style.display = "unset";
+      document.getElementById("loadingText").style.display = "none";
+      document.getElementById("loading").style.display = "unset";
+    };
+    document.getElementById("loadingText").style.display = "unset";
+    document.getElementById("loading").style.display = "none";
+    axios.post('/removebg', { }, { responseType: 'blob' })
+      .then((response) => {
+        reader.readAsDataURL(response.data);
+      }, (error) => {
+        document.getElementById("loadingText").style.display = "none";
+        document.getElementById("loading").style.display = "unset";
+      });
+    document.getElementById("image").scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   let count = 0;
   loadingText();
   function loadingText() {
@@ -343,11 +368,11 @@
     let elements = document.getElementsByClassName("channelColor");
     for (let i = 0; i < elements.length; i++) {
       elements[i].addEventListener('click', (e) => {
-        if (e.target.style.boxShadow == "" && e.target.className != "button"){
-          e.target.style.boxShadow = "0.7vmin 0.7vmin";          
+        if (e.target.style.boxShadow == "" && e.target.className != "button") {
+          e.target.style.boxShadow = "0.7vmin 0.7vmin";
           setColorsRequest(e.target.id);
         }
-        else if(e.target.className != "button"){
+        else if (e.target.className != "button") {
           e.target.style.boxShadow = "";
           setColorsRequest(e.target.id);
         }

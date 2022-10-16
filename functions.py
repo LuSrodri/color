@@ -1,3 +1,4 @@
+from os import remove
 import cv2
 from PIL import Image
 from sklearn.cluster import KMeans 
@@ -5,6 +6,7 @@ import imutils
 import numpy as np
 from colorthief import ColorThief
 import extcolors
+from rembg import remove
 
 def colorPaletteByKmeans(image, clusterNumber):
     # a function to get the color palette of an image and return it as a list with the RGB values and the percentage of each color
@@ -62,9 +64,7 @@ def removeSpecificColor(color):
     height, width = image.size
 
     rangePixel = 50
-    print(color)
     for c in range(len(color)):
-        print("removing color: ", color[c])
         if (len(color[c]) == 3 and isinstance(color[c][0],int)):
             for loop1 in range(height):
                 for loop2 in range(width):
@@ -91,3 +91,11 @@ def removeSpecificColor(color):
                     image_data[loop1, loop2] = r, g, 0
 
     image.save('static/images/response.jpg')
+
+def removeBG():
+    input_path = 'static/images/one.jpg'
+    output_path = 'static/images/response.png'
+
+    input = Image.open(input_path)
+    output = remove(input, 8)
+    output.save(output_path)
