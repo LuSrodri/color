@@ -16,8 +16,13 @@
     align-items: center;
   }
 
+  hr {
+    border-top: 1px solid black;
+  }
+
   button {
     margin: 0.5vmin;
+    transition: 201ms;
   }
 
   img {
@@ -60,7 +65,7 @@
 
   .colorsButton {
     border: solid black 0.5vmin;
-    margin: 0.25vmin;
+    margin: 0.75vmin;
   }
 
   @media (orientation: landscape) {
@@ -105,14 +110,13 @@
       </div>
       <h2>Remover canal de cores</h2>
       <div>
-        <button class="btn btn-danger" onclick="removeChannelColorRequest('red')">Vermelho(RED)</button>
-        <button class="btn btn-success" onclick="removeChannelColorRequest('green')">Verde(GREEN)</button>
-        <button class="btn btn-primary" onclick="removeChannelColorRequest('blue')">Azul(BLUE)</button>
+        <button id="red" class="btn btn-danger" onclick="clickChannelColor('red')">Vermelho(RED)</button>
+        <button id="green" class="btn btn-success" onclick="clickChannelColor('green')">Verde(GREEN)</button>
+        <button id="blue" class="btn btn-primary" onclick="clickChannelColor('blue')">Azul(BLUE)</button>
       </div>
-      <br>
       <hr>
-      <button class="btn btn-primary" onclick="backToStandard()">
-        <h2>Voltar ao padrão</h2>
+      <button class="btn btn-primary" onclick="sendColorRequest(colorsRequest)">
+        <h2>Processar Imagem</h2>
       </button>
     </div>
 
@@ -155,7 +159,6 @@
             showColorPaletteByExtColors(response);
             document.getElementById("loadingText").style.display = "none";
             document.getElementById("loading").style.display = "unset"
-            console.log(response);
           }, (error) => { });
         // document.getElementById("main").removeChild(document.getElementById("title"));
       };
@@ -180,6 +183,10 @@
         colorsElement.appendChild(spanText);
         colorsElement.addEventListener("click", (e) => {
           let colorOfElement = e.target.style.backgroundColor;
+          if (e.target.style.boxShadow == "" && e.target.className != "button")
+            e.target.style.boxShadow = "0.7vmin 0.7vmin";
+          else
+            e.target.style.boxShadow = "";
           if (colorOfElement !== '')
             setColorsRequest(e.target.style.backgroundColor);
         });
@@ -201,6 +208,10 @@
     dominantColor.style.backgroundColor = 'rgb(' + colorsData[0][0] + ',' + colorsData[0][1] + ',' + colorsData[0][2] + ')';
     dominantColor.addEventListener("click", (e) => {
       let colorOfElement = e.target.style.backgroundColor;
+      if (e.target.style.boxShadow == "" && e.target.className != "button")
+        e.target.style.boxShadow = "0.7vmin 0.7vmin";
+      else
+        e.target.style.boxShadow = "";
       if (colorOfElement !== '')
         setColorsRequest(e.target.style.backgroundColor);
     });
@@ -215,6 +226,10 @@
       colorsElement.style.backgroundColor = 'rgb(' + colorsData[i][0] + ',' + colorsData[i][1] + ',' + colorsData[i][2] + ')';
       colorsElement.addEventListener("click", (e) => {
         let colorOfElement = e.target.style.backgroundColor;
+        if (e.target.style.boxShadow == "" && e.target.className != "button")
+          e.target.style.boxShadow = "0.7vmin 0.7vmin";
+        else
+          e.target.style.boxShadow = "";
         if (colorOfElement !== '')
           setColorsRequest(e.target.style.backgroundColor);
       });
@@ -241,6 +256,10 @@
         colorsElement.appendChild(spanText);
         colorsElement.addEventListener("click", (e) => {
           let colorOfElement = e.target.style.backgroundColor;
+          if (e.target.style.boxShadow == "" && e.target.className != "button")
+            e.target.style.boxShadow = "0.7vmin 0.7vmin";
+          else
+            e.target.style.boxShadow = "";
           if (colorOfElement !== '')
             setColorsRequest(e.target.style.backgroundColor);
         });
@@ -252,41 +271,46 @@
   }
 
   function setColorsRequest(color) {
-    document.getElementById("loadingText").style.display = "unset";
-    document.getElementById("loading").style.display = "none";
-    color = color.replace('rgb(', '').replace(')', '').split(',').map(Number);
-    // for (const arr of colorsRequest) {
-    //   if (arr.toString() === color.toString()) {
-    //     colorsRequest.delete(arr);
-    //     getModifiedImage(colorsRequest);
-    //     return 0;
-    //   }
-    // }
-    // colorsRequest.add(color);
-    // getModifiedImage(colorsRequest);
-    // return 0;
-    removeColorRequest(color);
+    // document.getElementById("loadingText").style.display = "unset";
+    // document.getElementById("loading").style.display = "none";
+    if (color.includes('rgb'))
+      color = color.replace('rgb(', '').replace(')', '').split(',').map(Number);
+    for (const arr of colorsRequest) {
+      if (arr.toString() === color.toString()) {
+        colorsRequest.delete(arr);
+        return 0;
+      }
+    }
+    colorsRequest.add(color);
+    return 0;
   }
 
-  async function removeColorRequest(colorsToSend) {
+  async function sendColorRequest(colorsToSend) {
+    colorsToSend = Array.from(colorsToSend);
     let reader = new FileReader();
     reader.onload = (e) => {
       imageResult.src = e.target.result;
       image.style.display = "none";
       imageResult.style.display = "unset";
       document.getElementById("loadingText").style.display = "none";
-      document.getElementById("loading").style.display = "unset"
+      document.getElementById("loading").style.display = "unset";
     };
     if (colorsToSend.length > 0) {
+      document.getElementById("loadingText").style.display = "unset";
+      document.getElementById("loading").style.display = "none";
       axios.post('/removeColor', { "colorsToSend": colorsToSend }, { responseType: 'blob' })
         .then((response) => {
           reader.readAsDataURL(response.data);
-        }, (error) => { });
+        }, (error) => {
+          document.getElementById("loadingText").style.display = "none";
+          document.getElementById("loading").style.display = "unset";
+        });
     }
     else {
       imageResult.style.display = "none";
       image.style.display = "unset";
     }
+    document.getElementById("image").scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   let count = 0;
@@ -302,34 +326,34 @@
     }, 300);
   }
 
-  function backToStandard() {
-    document.getElementById("image").style.display = "unset";
-    document.getElementById("imageResult").style.display = "none";
-
-    document.getElementById("image").scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  async function removeChannelColorRequest(colorsToSend) {
-    document.getElementById("loadingText").style.display = "unset";
-    document.getElementById("loading").style.display = "none";
-    let reader = new FileReader();
-    reader.onload = (e) => {
-      imageResult.src = e.target.result;
-      image.style.display = "none";
-      imageResult.style.display = "unset";
-      document.getElementById("loadingText").style.display = "none";
-      document.getElementById("loading").style.display = "unset";
-    };
-    if (colorsToSend.length > 0) {
-      axios.post('/removeColor', { "colorsToSend": colorsToSend }, { responseType: 'blob' })
-        .then((response) => {
-          reader.readAsDataURL(response.data);
-        }, (error) => { });
-    }
-    else {
-      imageResult.style.display = "none";
-      image.style.display = "unset";
-    }
+  function clickChannelColor(color) {
+    if (color === "red")
+      if (document.getElementById("red").innerHTML.includes("✅")) {
+        document.getElementById("red").innerHTML = "Vermelho(RED)";
+        setColorsRequest(color);
+      }
+      else {
+        document.getElementById("red").innerHTML += "✅";
+        setColorsRequest(color);
+      }
+    if (color === "green")
+      if (document.getElementById("green").innerHTML.includes("✅")) {
+        document.getElementById("green").innerHTML = "Verde(GREEN)";
+        setColorsRequest(color);
+      }
+      else {
+        document.getElementById("green").innerHTML += "✅";
+        setColorsRequest(color);
+      }
+    if (color === "blue")
+      if (document.getElementById("blue").innerHTML.includes("✅")) {
+        document.getElementById("blue").innerHTML = "Azul(BLUE)";
+        setColorsRequest(color);
+      }
+      else {
+        document.getElementById("blue").innerHTML += "✅";
+        setColorsRequest(color);
+      }
   }
 </script>
 

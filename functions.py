@@ -56,37 +56,38 @@ def getPercentagesOfColorsByPixel(pixel_count, colors):
         percentages.append(colors[i][1]/pixel_count*100)
     return percentages
 
-def removeSpecificColor(filename, color):
+def removeSpecificColor(color):
     image = Image.open('static/images/one.jpg').convert('RGB')
     image_data = image.load()
     height, width = image.size
 
     rangePixel = 50
-
-    if (len(color) == 3 and isinstance(color[0],int)):
-        for i in range(len(color)):
+    print(color)
+    for c in range(len(color)):
+        print("removing color: ", color[c])
+        if (len(color[c]) == 3 and isinstance(color[c][0],int)):
             for loop1 in range(height):
                 for loop2 in range(width):
                     r, g, b = image_data[loop1, loop2]
-                    if r in range(int(color[0])-rangePixel, int(color[0])+rangePixel) and g in range(int(color[1])-rangePixel, int(color[1])+rangePixel) and b in range(int(color[2])-rangePixel, int(color[2])+rangePixel):
+                    if r in range(int(color[c][0])-rangePixel, int(color[c][0])+rangePixel) and g in range(int(color[c][1])-rangePixel, int(color[c][1])+rangePixel) and b in range(int(color[c][2])-rangePixel, int(color[c][2])+rangePixel):
                         image_data[loop1, loop2] = 255, 255, 255
 
-    if (color == 'red'):
-        for loop1 in range(height):
-            for loop2 in range(width):
-                r, g, b = image_data[loop1, loop2]
-                image_data[loop1, loop2] = 0, g, b
+        elif (color[c] == 'red'):
+            for loop1 in range(height):
+                for loop2 in range(width):
+                    r, g, b = image_data[loop1, loop2]
+                    image_data[loop1, loop2] = 0, g, b
 
-    elif (color == 'green'):
-        for loop1 in range(height):
-            for loop2 in range(width):
-                r, g, b = image_data[loop1, loop2]
-                image_data[loop1, loop2] = r, 0, b
+        elif (color[c] == 'green'):
+            for loop1 in range(height):
+                for loop2 in range(width):
+                    r, g, b = image_data[loop1, loop2]
+                    image_data[loop1, loop2] = r, 0, b
 
-    elif (color == 'blue'):
-        for loop1 in range(height):
-            for loop2 in range(width):
-                r, g, b = image_data[loop1, loop2]
-                image_data[loop1, loop2] = r, g, 0
+        elif (color[c] == 'blue'):
+            for loop1 in range(height):
+                for loop2 in range(width):
+                    r, g, b = image_data[loop1, loop2]
+                    image_data[loop1, loop2] = r, g, 0
 
     image.save('static/images/response.jpg')

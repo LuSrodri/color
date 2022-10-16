@@ -55,8 +55,10 @@ def removeColor():
     if request.method == "POST":
         request_data = request.get_json()
         colorReceived = request_data['colorsToSend']
+        print(colorReceived)
+        colorReceived = list(colorReceived)
 
-        removeSpecificColor(filename, colorReceived)
+        removeSpecificColor(colorReceived)
 
         return send_file('static/images/response.jpg', mimetype='image/*')
     return redirect('/')
