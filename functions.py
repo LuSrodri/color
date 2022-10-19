@@ -40,7 +40,8 @@ def colorPaletteByColorThief(image, number_of_colors):
     return palette
 
 def colorPaletteByExtColor(image, number_of_colors):
-    colors, pixel_count = extcolors.extract_from_path(image, 25, number_of_colors)
+    image = Image.open(image)
+    colors, pixel_count = extcolors.extract_from_image(image, 25, number_of_colors)
     percentages = getPercentagesOfColorsByPixel(pixel_count, colors)
 
     p_and_c = zip(percentages, colors)
@@ -63,7 +64,7 @@ def removeSpecificColor(color):
     image_data = image.load()
     height, width = image.size
 
-    rangePixel = 50
+    rangePixel = 80
     for c in range(len(color)):
         if (len(color[c]) == 3 and isinstance(color[c][0],int)):
             for loop1 in range(height):

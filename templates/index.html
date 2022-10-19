@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="../static/css/index.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css"
+    integrity="sha512-5PV92qsds/16vyYIJo3T/As4m2d8b6oWYfoqV+vtizRB6KhF1F9kYzWzQmsO6T3z3QG2Xdhrx7FQ+5R1LiQdUA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <style>
@@ -31,14 +35,9 @@
     border-radius: 3vmin;
   }
 
-  h2 {
+  h2,
+  p {
     text-align: center;
-  }
-
-  button.channelColor {
-    border: solid black 0.5vmin;
-    width: 13vmin;
-    height: 13vmin;
   }
 
   div.divColors {
@@ -73,9 +72,28 @@
     font-size: 4vmin;
   }
 
+  .colorsElement {
+    margin: 0 0.75vmin;
+  }
+
   .colorsButton {
     border: solid black 0.5vmin;
     margin: 0.75vmin;
+    width: 15vmin;
+    height: 15vmin;
+  }
+
+  .textColorsElement {
+    background-color: black;
+    color: white;
+    font-weight: bolder;
+    margin-bottom: 0;
+    font-size: 2.25vmin;
+  }
+
+  .hexCode {
+    cursor: pointer;
+    transition: 100ms;
   }
 
   @media (orientation: landscape) {
@@ -105,33 +123,43 @@
 
     <h3 id="loadingText" style="display: none;">Processando</h3>
     <div id="loading" style="display: none; align-items: center; flex-direction: column;">
-      <h2>Paletas de cores retirada usando o <a href="https://scikit-learn.org/stable/index.html"> Scikit-Learn</a></h2>
+      <!-- <h2>Paletas de cores retirada usando o <a href="https://scikit-learn.org/stable/index.html"> Scikit-Learn</a></h2>
       <div id="colorsByScikit-Learn" class="divColors">
-        <!-- mostrando as cores -->
+        mostrando as cores
       </div>
       <h2>Paletas de cores retirada usando o <a href="https://lokeshdhakar.com/projects/color-thief/"> Color Thief</a>
       </h2>
       <div id="colorsByColorThief" class="divColors">
-        <!-- mostrando as cores -->
-      </div>
-      <h2>Paletas de cores retirada usando o <a href="https://github.com/CairX/extract-colors-py"> Ext Colors</a></h2>
+        mostrando as cores 
+      </div> -->
+      <h2 style="margin-bottom: 0;">Paleta de cores obtida com a porcentagem e código hexadecimal de cada cor:</h2>
+      <p style="margin-top: 0;">(Clique em uma ou mais cores para selecionar e clique em "Processar imagem" para
+        remover.)</p>
       <div id="colorsByExtColors" class="divColors">
         <!-- mostrando as cores -->
       </div>
-      <h2>Remover canal de cores</h2>
+      <h2>Remover canais de cores(R,G,B):</h2>
       <div class="divColors">
-        <button id="red" class="channelColor" style="background-color: red;"><span class="button">red</span></button>
-        <button id="green" class="channelColor" style="background-color: green;"><span
-            class="button">green</span></button>
-        <button id="blue" class="channelColor" style="background-color: blue;"><span class="button">blue</span></button>
+        <span class="colorsElement">
+          <button id="red" class="channelColor colorsButton" style="background-color: red;"></button>
+          <p class="textColorsElement">RED</p>
+        </span>
+        <span class="colorsElement">
+          <button id="green" class="channelColor colorsButton" style="background-color: green;"></button>
+          <p class="textColorsElement">GREEN</p>
+        </span>
+        <span class="colorsElement">
+          <button id="blue" class="channelColor colorsButton" style="background-color: blue;"></button>
+          <p class="textColorsElement">BLUE</p>
+        </span>
       </div>
       <hr>
       <button class="btn btn-dark btn-block" onclick="sendColorRequest(colorsRequest)">
         <h3 style="font-size: 4vmin;">Processar imagem</h3>
       </button>
-      <button class="btn btn-light btn-block" onclick="sendRemoveBg()">
+      <!-- <button class="btn btn-light btn-block" onclick="sendRemoveBg()">
         <h3 style="font-size: 4vmin;">Remover fundo</h3>
-      </button>
+      </button> -->
     </div>
 
   </div>
@@ -155,7 +183,6 @@
   let image = document.getElementById("image");
   let imageResult = document.getElementById("imageResult");
   let form = document.getElementById("form");
-  let data = new FormData();
   imageInput.addEventListener("input", async () => {
     if (imageInput.files && imageInput.files[0]) {
       document.getElementById("loadingText").style.display = "unset";
@@ -164,16 +191,18 @@
         image.src = e.target.result;
         image.style.display = "unset";
         imageInput.style.display = "none";
+        let data = new FormData();
         await data.append('file', imageInput.files[0]);
         imageFile = imageInput.files[0];
         axios.post('/getcolorpalettebyimage', data)
           .then((response) => {
-            showColorPaletteByScikitLearn(response);
-            showColorPaletteByColorThief(response);
+            //showColorPaletteByScikitLearn(response);
+            //showColorPaletteByColorThief(response);
             showColorPaletteByExtColors(response);
             document.getElementById("loadingText").style.display = "none";
             document.getElementById("loading").style.display = "unset"
             setChannelColors();
+            window.scrollTo({ top: 1000, behavior: 'smooth' });
           }, (error) => { });
         // document.getElementById("main").removeChild(document.getElementById("title"));
       };
@@ -181,95 +210,91 @@
     }
   })
 
-  function showColorPaletteByScikitLearn(response) {
-    let colorsElement = document.getElementsByClassName("colorsByScikit-Learn");
-    colorsData = response.data.colorsByKmeans;
+  // function showColorPaletteByScikitLearn(response) {
+  //   let colorsElement = document.getElementsByClassName("colorsByScikit-Learn");
+  //   colorsData = response.data.colorsByKmeans;
 
-    for (let i = 0; i < colorsData.length; i++) {
-      if ((colorsData[i][0] * 100) > 1) {
-        colorsElement = document.createElement("button");
-        colorsElement.className = "colorsButton";
-        colorsElement.style.width = "13vmin";
-        colorsElement.style.height = "13vmin";
-        colorsElement.style.backgroundColor = 'rgb(' + colorsData[i][1][0] + ',' + colorsData[i][1][1] + ',' + colorsData[i][1][2] + ')';
-        spanText = document.createElement("span");
-        spanText.innerHTML = `${(colorsData[i][0] * 100).toFixed(2)}%`;
-        spanText.className = "button";
-        colorsElement.appendChild(spanText);
-        colorsElement.addEventListener("click", (e) => {
-          let colorOfElement = e.target.style.backgroundColor;
-          if (e.target.style.boxShadow == "" && e.target.className != "button")
-            e.target.style.boxShadow = "0.7vmin 0.7vmin";
-          else
-            e.target.style.boxShadow = "";
-          if (colorOfElement !== '')
-            setColorsRequest(e.target.style.backgroundColor);
-        });
+  //   for (let i = 0; i < colorsData.length; i++) {
+  //     if ((colorsData[i][0] * 100) > 1) {
+  //       colorsElement = document.createElement("button");
+  //       colorsElement.className = "colorsButton";
+  //       colorsElement.style.width = "13vmin";
+  //       colorsElement.style.height = "13vmin";
+  //       colorsElement.style.backgroundColor = 'rgb(' + colorsData[i][1][0] + ',' + colorsData[i][1][1] + ',' + colorsData[i][1][2] + ')';
+  //       spanText = document.createElement("span");
+  //       spanText.innerHTML = `${(colorsData[i][0] * 100).toFixed(2)}%`;
+  //       spanText.className = "button";
+  //       colorsElement.appendChild(spanText);
+  //       colorsElement.addEventListener("click", (e) => {
+  //         let colorOfElement = e.target.style.backgroundColor;
+  //         if (e.target.style.boxShadow == "" && e.target.className != "button")
+  //           e.target.style.boxShadow = "0.7vmin 0.7vmin";
+  //         else
+  //           e.target.style.boxShadow = "";
+  //         if (colorOfElement !== '')
+  //           setColorsRequest(e.target.style.backgroundColor);
+  //       });
 
-        document.getElementById("colorsByScikit-Learn").appendChild(colorsElement);
-      }
-    }
-    document.getElementsByClassName("colorsButton")[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+  //       document.getElementById("colorsByScikit-Learn").appendChild(colorsElement);
+  //     }
+  //   }
+  //   document.getElementsByClassName("colorsButton")[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // }
 
-  function showColorPaletteByColorThief(response) {
-    let colorsElement = document.getElementsByClassName("colorsByColorThief");
-    colorsData = response.data.colorByColorThief;
+  // function showColorPaletteByColorThief(response) {
+  //   let colorsElement = document.getElementsByClassName("colorsByColorThief");
+  //   colorsData = response.data.colorByColorThief;
 
-    dominantColor = document.createElement("button");
-    dominantColor.className = "colorsButton";
-    dominantColor.style.width = "16vmin";
-    dominantColor.style.height = "16vmin";
-    dominantColor.style.backgroundColor = 'rgb(' + colorsData[0][0] + ',' + colorsData[0][1] + ',' + colorsData[0][2] + ')';
-    dominantColor.addEventListener("click", (e) => {
-      let colorOfElement = e.target.style.backgroundColor;
-      if (e.target.style.boxShadow == "" && e.target.className != "button")
-        e.target.style.boxShadow = "0.7vmin 0.7vmin";
-      else
-        e.target.style.boxShadow = "";
-      if (colorOfElement !== '')
-        setColorsRequest(e.target.style.backgroundColor);
-    });
+  //   dominantColor = document.createElement("button");
+  //   dominantColor.className = "colorsButton";
+  //   dominantColor.style.width = "16vmin";
+  //   dominantColor.style.height = "16vmin";
+  //   dominantColor.style.backgroundColor = 'rgb(' + colorsData[0][0] + ',' + colorsData[0][1] + ',' + colorsData[0][2] + ')';
+  //   dominantColor.addEventListener("click", (e) => {
+  //     let colorOfElement = e.target.style.backgroundColor;
+  //     if (e.target.style.boxShadow == "" && e.target.className != "button")
+  //       e.target.style.boxShadow = "0.7vmin 0.7vmin";
+  //     else
+  //       e.target.style.boxShadow = "";
+  //     if (colorOfElement !== '')
+  //       setColorsRequest(e.target.style.backgroundColor);
+  //   });
 
-    document.getElementById("colorsByColorThief").appendChild(dominantColor);
+  //   document.getElementById("colorsByColorThief").appendChild(dominantColor);
 
-    for (let i = 1; i < colorsData.length; i++) {
-      colorsElement = document.createElement("button");
-      colorsElement.className = "colorsButton";
-      colorsElement.style.width = "13vmin";
-      colorsElement.style.height = "13vmin";
-      colorsElement.style.backgroundColor = 'rgb(' + colorsData[i][0] + ',' + colorsData[i][1] + ',' + colorsData[i][2] + ')';
-      colorsElement.addEventListener("click", (e) => {
-        let colorOfElement = e.target.style.backgroundColor;
-        if (e.target.style.boxShadow == "" && e.target.className != "button")
-          e.target.style.boxShadow = "0.7vmin 0.7vmin";
-        else
-          e.target.style.boxShadow = "";
-        if (colorOfElement !== '')
-          setColorsRequest(e.target.style.backgroundColor);
-      });
+  //   for (let i = 1; i < colorsData.length; i++) {
+  //     colorsElement = document.createElement("button");
+  //     colorsElement.className = "colorsButton";
+  //     colorsElement.style.width = "13vmin";
+  //     colorsElement.style.height = "13vmin";
+  //     colorsElement.style.backgroundColor = 'rgb(' + colorsData[i][0] + ',' + colorsData[i][1] + ',' + colorsData[i][2] + ')';
+  //     colorsElement.addEventListener("click", (e) => {
+  //       let colorOfElement = e.target.style.backgroundColor;
+  //       if (e.target.style.boxShadow == "" && e.target.className != "button")
+  //         e.target.style.boxShadow = "0.7vmin 0.7vmin";
+  //       else
+  //         e.target.style.boxShadow = "";
+  //       if (colorOfElement !== '')
+  //         setColorsRequest(e.target.style.backgroundColor);
+  //     });
 
-      document.getElementById("colorsByColorThief").appendChild(colorsElement);
-    }
-    document.getElementsByClassName("colorsButton")[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+  //     document.getElementById("colorsByColorThief").appendChild(colorsElement);
+  //   }
+  //   document.getElementsByClassName("colorsButton")[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // }
 
   function showColorPaletteByExtColors(response) {
-    let colorsElement = document.getElementsByClassName("colorsByExtColors");
+    let colorsElement = document.getElementById("colorsByExtColors");
     colorsData = response.data.colorsByExtColor;
 
     for (let i = 0; i < colorsData.length; i++) {
       if (colorsData[i][0] > 1) {
-        colorsElement = document.createElement("button");
-        colorsElement.className = "colorsButton";
-        colorsElement.style.width = "13vmin";
-        colorsElement.style.height = "13vmin";
-        colorsElement.style.backgroundColor = 'rgb(' + colorsData[i][1][0][0] + ',' + colorsData[i][1][0][1] + ',' + colorsData[i][1][0][2] + ')';
-        spanText = document.createElement("span");
-        spanText.innerHTML = `${(colorsData[i][0]).toFixed(2)}%`;
-        spanText.className = "button";
-        colorsElement.appendChild(spanText);
-        colorsElement.addEventListener("click", (e) => {
+        let colorsItem = document.createElement("span");
+        colorsItem.className = "colorsElement";
+        let colorsButton = document.createElement("button");
+        colorsButton.className = "colorsButton";
+        colorsButton.style.backgroundColor = 'rgb(' + colorsData[i][1][0][0] + ',' + colorsData[i][1][0][1] + ',' + colorsData[i][1][0][2] + ')';
+        colorsButton.addEventListener("click", (e) => {
           let colorOfElement = e.target.style.backgroundColor;
           if (e.target.style.boxShadow == "" && e.target.className != "button")
             e.target.style.boxShadow = "0.7vmin 0.7vmin";
@@ -279,10 +304,44 @@
             setColorsRequest(e.target.style.backgroundColor);
         });
 
-        document.getElementById("colorsByExtColors").appendChild(colorsElement);
+        let percentage = document.createElement("p");
+        percentage.innerHTML = `${(colorsData[i][0]).toFixed(2)}%`;
+        percentage.className = "textColorsElement";
+        let hexCode = document.createElement("p");
+        hexCode.className = "textColorsElement hexCode";
+        hexCode.innerHTML = rgbToHex(colorsData[i][1][0][0], colorsData[i][1][0][1], colorsData[i][1][0][2]).toUpperCase() + " <i style='color: white;' class='bi bi-clipboard'></i>";
+
+        hexCode.addEventListener("click", e => {
+          if (e.target.className == "bi bi-clipboard") {
+            e.target.parentNode.style.color = "blue";
+            e.target.style.color = "blue";
+            e.target.className = "bi bi-clipboard-check";
+            setTimeout(() => {
+              e.target.parentNode.style.color = "white";
+              e.target.style.color = "white";
+              e.target.className = "bi bi-clipboard";
+            }, 1000);
+            navigator.clipboard.writeText(e.target.parentNode.innerHTML.substring(0, 7));
+            return;
+          }
+          let text = e.target.innerHTML.substring(0, 7) + "";
+          e.target.style.color = "blue";
+          e.target.innerHTML = text + " <i class='bi bi-clipboard-check'></i>";
+          setTimeout(() => {
+            e.target.style.color = "white";
+            e.target.innerHTML = e.target.innerHTML.substring(0, 7) + " <i class='bi bi-clipboard'></i>";
+          }, 1000);
+          navigator.clipboard.writeText(e.target.innerHTML.substring(0, 7));
+        });
+
+        colorsItem.appendChild(colorsButton);
+        colorsItem.appendChild(percentage);
+        colorsItem.appendChild(hexCode);
+        colorsElement.appendChild(colorsItem);
+
       }
     }
-    document.getElementsByClassName("colorsButton")[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById("colorsByExtColors").scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function setColorsRequest(color) {
@@ -311,14 +370,18 @@
       imageResult.style.display = "unset";
       document.getElementById("loadingText").style.display = "none";
       document.getElementById("loading").style.display = "unset";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     if (colorsToSend.length > 0) {
       document.getElementById("loadingText").style.display = "unset";
       document.getElementById("loading").style.display = "none";
+
       axios.post('/removeColor', { "colorsToSend": colorsToSend }, { responseType: 'blob' })
         .then((response) => {
+          console.log(response);
           reader.readAsDataURL(response.data);
         }, (error) => {
+          console.log(error);
           document.getElementById("loadingText").style.display = "none";
           document.getElementById("loading").style.display = "unset";
         });
@@ -326,8 +389,8 @@
     else {
       imageResult.style.display = "none";
       image.style.display = "unset";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    document.getElementById("image").scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   async function sendRemoveBg() {
@@ -341,7 +404,7 @@
     };
     document.getElementById("loadingText").style.display = "unset";
     document.getElementById("loading").style.display = "none";
-    axios.post('/removebg', { }, { responseType: 'blob' })
+    axios.post('/removebg', {}, { responseType: 'blob' })
       .then((response) => {
         reader.readAsDataURL(response.data);
       }, (error) => {
@@ -377,6 +440,17 @@
           setColorsRequest(e.target.id);
         }
       });
+    }
+  }
+
+
+
+  function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+
+    function componentToHex(c) {
+      var hex = c.toString(16);
+      return hex.length == 1 ? "0" + hex : hex;
     }
   }
 

@@ -1,6 +1,6 @@
 from http.client import BAD_REQUEST
 from werkzeug.utils import secure_filename
-from flask import Flask, Response, render_template, request, redirect, send_file, url_for
+from flask import Flask, Response, render_template, request, redirect, send_file
 import os
 from functions import *
 
@@ -44,7 +44,7 @@ def get_color_palette_image():
 
         colorsByKmeans = colorPaletteByKmeans(absolute_path, numbers_of_colors_palette)
         colorByColorThief = colorPaletteByColorThief(absolute_path, numbers_of_colors_palette)
-        colorsByExtColor = colorPaletteByExtColor(absolute_path, numbers_of_colors_palette)
+        colorsByExtColor = colorPaletteByExtColor(image, numbers_of_colors_palette)
 
         return {"colorsByKmeans": colorsByKmeans, "colorByColorThief": colorByColorThief, "colorsByExtColor": colorsByExtColor}
 
@@ -60,6 +60,7 @@ def removeColor():
         removeSpecificColor(colorReceived)
 
         return send_file('static/images/response.jpg', mimetype='image/*')
+    
     return redirect('/')
 
 @app.route('/removebg', methods=["GET", "POST"])
