@@ -1,10 +1,12 @@
 from os import remove
+import os
 from PIL import Image
 import extcolors
 from rembg import remove
 
 
 def colorPaletteByExtColor(image, number_of_colors):
+    cleaningResponseFile()
     image = Image.open(image)
     colors, pixel_count = extcolors.extract_from_image(
         image, 25, number_of_colors)
@@ -28,6 +30,7 @@ def getPercentagesOfColorsByPixel(pixel_count, colors):
 
 
 def removeSpecificColor(color):
+    cleaningResponseFile()
     image = Image.open('static/images/one.jpg').convert('RGB')
     image_data = image.load()
     height, width = image.size
@@ -60,3 +63,24 @@ def removeSpecificColor(color):
                     image_data[loop1, loop2] = r, g, 0
 
     image.save('static/images/response.jpg')
+
+
+def cleaningFiles():
+    extensions = ['.jpg', '.png']
+    mainFile = "static/images/one"
+    response = 'static/images/response'
+
+    for ext in extensions:
+        if os.path.isfile(mainFile+ext):
+            os.remove(mainFile+ext)
+        if os.path.isfile(response+ext):
+            os.remove(response+ext)
+
+
+def cleaningResponseFile():
+    extensions = ['.jpg', '.png']
+    response = 'static/images/response'
+
+    for ext in extensions:
+        if os.path.isfile(response+ext):
+            os.remove(response+ext)

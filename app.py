@@ -11,9 +11,12 @@ app.config['IMAGE_UPLOADS'] = 'static\images'
 filename = 0
 absolute_path = 0
 
+
 @app.route('/', methods=["GET", "POST"])
 def upload_image():
+    cleaningFiles()
     return render_template('index.html')
+
 
 @app.route('/getcolorpalettebyimage', methods=["GET", "POST"])
 def get_color_palette_image():
@@ -42,13 +45,13 @@ def get_color_palette_image():
 
         numbers_of_colors_palette = 8
 
-        colorsByKmeans = colorPaletteByKmeans(absolute_path, numbers_of_colors_palette)
-        colorByColorThief = colorPaletteByColorThief(absolute_path, numbers_of_colors_palette)
-        colorsByExtColor = colorPaletteByExtColor(image, numbers_of_colors_palette)
+        colorsByExtColor = colorPaletteByExtColor(
+            image, numbers_of_colors_palette)
 
-        return {"colorsByKmeans": colorsByKmeans, "colorByColorThief": colorByColorThief, "colorsByExtColor": colorsByExtColor}
+        return {"colorsByExtColor": colorsByExtColor}
 
     return redirect("/")
+
 
 @app.route('/removeColor', methods=["GET", "POST"])
 def removeColor():
@@ -60,14 +63,14 @@ def removeColor():
         removeSpecificColor(colorReceived)
 
         return send_file('static/images/response.jpg', mimetype='image/*')
-    
+
     return redirect('/')
+
 
 @app.route('/removebg', methods=["GET", "POST"])
 def removingBg():
     if request.method == "POST":
-        
-        removeBG()
+
         return send_file('static/images/response.png', mimetype='image/png')
 
     return redirect('/')
