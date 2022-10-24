@@ -1,8 +1,6 @@
-from os import remove
 import os
 from PIL import Image
 import extcolors
-from rembg import remove
 
 
 def colorPaletteByExtColor(image, number_of_colors):
@@ -29,11 +27,12 @@ def getPercentagesOfColorsByPixel(pixel_count, colors):
     return percentages
 
 
-def removeSpecificColor(color):
+def removeSpecificColor(color, imagePath):
     cleaningResponseFile()
-    image = Image.open('static/images/one.jpg').convert('RGB')
+    image = Image.open('static/images/'+imagePath).convert('RGB')
     image_data = image.load()
     height, width = image.size
+    totalPixelsRemoved = 0
 
     rangePixel = 80
     for c in range(len(color)):
@@ -43,29 +42,44 @@ def removeSpecificColor(color):
                     r, g, b = image_data[loop1, loop2]
                     if r in range(int(color[c][0])-rangePixel, int(color[c][0])+rangePixel) and g in range(int(color[c][1])-rangePixel, int(color[c][1])+rangePixel) and b in range(int(color[c][2])-rangePixel, int(color[c][2])+rangePixel):
                         image_data[loop1, loop2] = 255, 255, 255
+                        totalPixelsRemoved += 1
 
         elif (color[c] == 'red'):
             for loop1 in range(height):
                 for loop2 in range(width):
                     r, g, b = image_data[loop1, loop2]
                     image_data[loop1, loop2] = 0, g, b
+                    totalPixelsRemoved += 1
 
         elif (color[c] == 'green'):
             for loop1 in range(height):
                 for loop2 in range(width):
                     r, g, b = image_data[loop1, loop2]
                     image_data[loop1, loop2] = r, 0, b
+                    totalPixelsRemoved += 1
 
         elif (color[c] == 'blue'):
             for loop1 in range(height):
                 for loop2 in range(width):
                     r, g, b = image_data[loop1, loop2]
                     image_data[loop1, loop2] = r, g, 0
+                    totalPixelsRemoved += 1
 
     image.save('static/images/response.jpg')
+    return totalPixelsRemoved
 
 
-def cleaningFiles():
+async def getImageInfos(imagePath):
+    image = Image.open(imagePath)
+    width, height = image.size
+
+    totalBytes = os.path.getsize(imagePath)
+
+    imageInfos = {"totalPixel": width*height, "totalBytes": totalBytes}
+    return imageInfos
+
+
+async def cleaningFiles():
     extensions = ['.jpg', '.png']
     mainFile = "static/images/one"
     response = 'static/images/response'

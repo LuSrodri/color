@@ -1,8 +1,10 @@
 from http.client import BAD_REQUEST
+import json
 from werkzeug.utils import secure_filename
 from flask import Flask, Response, render_template, request, redirect, send_file
 import os
 from functions import *
+from requests_toolbelt import MultipartEncoder
 
 app = Flask(__name__)
 
@@ -19,58 +21,67 @@ def upload_image():
 
 
 @app.route('/getcolorpalettebyimage', methods=["GET", "POST"])
-def get_color_palette_image():
+async def get_color_palette_image():
     if request.method == "POST":
-        image = request.files['file']
-
-        if image.filename == '':
-            Response("Image must have a file name", status=BAD_REQUEST)
-        if image.content_type != 'image/jpeg' and image.content_type != 'image/png':
-            Response("Image must be a jpeg or png", status=BAD_REQUEST)
-
-        if image.content_type == 'image/jpeg':
-            image.filename = 'one.jpg'
-        if image.content_type == 'image/png':
-            image.filename = 'one.png'
-
-        global filename
-        filename = secure_filename(image.filename)
-
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        global absolute_path
-        absolute_path = os.path.join(
-            basedir, app.config["IMAGE_UPLOADS"], filename)
-
-        image.save(absolute_path)
+        image = getImageFromRequest(request, 'one')
 
         numbers_of_colors_palette = 8
 
         colorsByExtColor = colorPaletteByExtColor(
             image, numbers_of_colors_palette)
 
-        return {"colorsByExtColor": colorsByExtColor}
+        imageInfos = await getImageInfos('static/images/one.jpg')
+
+        return {"imageInfos": imageInfos, "colorsByExtColor": colorsByExtColor, "imagePath": "one.jpg"}
 
     return redirect("/")
 
 
 @app.route('/removeColor', methods=["GET", "POST"])
-def removeColor():
+async def removeColor():
     if request.method == "POST":
         request_data = request.get_json()
+
         colorReceived = request_data['colorsToSend']
         colorReceived = list(colorReceived)
+        imagePath = request_data['imagePath']
 
-        removeSpecificColor(colorReceived)
+        totalPixelsRemoved = removeSpecificColor(colorReceived, imagePath)
 
-        return send_file('static/images/response.jpg', mimetype='image/*')
+        imageInfos = await getImageInfos('static/images/response.jpg')
 
-    return redirect('/')
-
-
-@app.route('/removebg', methods=["GET", "POST"])
-def removingBg():
-    if request.method == "POST":
-
-        return send_file('static/images/response.png', mimetype='image/png')
+        return {"imageInfos": imageInfos, "totalPixelsRemoved": totalPixelsRemoved, "imageResponsePath": "response.jpg"}
 
     return redirect('/')
+
+
+@app.route('/getImage', methods=["POST"])
+def getImage():
+    request_data = request.get_json()
+    imagePath = request_data['imagePath']
+    return send_file(('static/images/' + imagePath), mimetype='image/jpg')
+
+
+def getImageFromRequest(request, name):
+    image = request.files['file']
+    if image.filename == '':
+        Response("Image must have a file name", status=BAD_REQUEST)
+    if image.content_type != 'image/jpeg' and image.content_type != 'image/png':
+        Response("Image must be a jpeg or png", status=BAD_REQUEST)
+
+    if image.content_type == 'image/jpeg':
+        image.filename = name + '.jpg'
+    if image.content_type == 'image/png':
+        image.filename = name + '.png'
+
+    global filename
+    filename = secure_filename(image.filename)
+
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    global absolute_path
+    absolute_path = os.path.join(
+        basedir, app.config["IMAGE_UPLOADS"], filename)
+
+    image.save(absolute_path)
+
+    return image
