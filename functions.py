@@ -1,6 +1,7 @@
 import os
 from PIL import Image
 import extcolors
+import time
 
 
 async def colorPaletteByExtColor(image, number_of_colors):
@@ -37,10 +38,10 @@ async def removeSpecificColor(color, imagePath):
     rangePixel = 80
     for c in range(len(color)):
         if (len(color[c]) == 3 and isinstance(color[c][0], int)):
-            # totalPixelsRemoved = removeStrictPercentageColors(imagePath,
-            #                                                   c, totalPixelsRemoved, image_data, color, height, width)
-            totalPixelsRemoved = removeColorsWithRangeError(c, totalPixelsRemoved,
-                                                            image_data, color, height, width, rangePixel)
+            totalPixelsRemoved = removeStrictPercentageColors(imagePath,
+                                                              c, totalPixelsRemoved, image_data, color, height, width)
+            # totalPixelsRemoved = removeColorsWithRangeError(c, totalPixelsRemoved,
+            #                                                 image_data, color, height, width, rangePixel)
 
         elif (color[c] == 'red'):
             for loop1 in range(height):
@@ -99,6 +100,7 @@ async def cleaningResponseFile():
 
 
 def removeColorsWithRangeError(c, totalPixelsRemoved, image_data, color, height, width, rangePixel=80):
+    ini = time.time()
     total = totalPixelsRemoved
     for loop1 in range(height):
         for loop2 in range(width):
@@ -106,12 +108,13 @@ def removeColorsWithRangeError(c, totalPixelsRemoved, image_data, color, height,
             if r in range(int(color[c][0])-rangePixel, int(color[c][0])+rangePixel) and g in range(int(color[c][1])-rangePixel, int(color[c][1])+rangePixel) and b in range(int(color[c][2])-rangePixel, int(color[c][2])+rangePixel):
                 image_data[loop1, loop2] = 255, 255, 255
                 total += 1
-
+    fim = time.time()
+    print('tempo de execucao (velocidade) = ', fim-ini)
     return total
 
 
 def removeStrictPercentageColors(imagePath, c, totalPixelsRemoved, image_data, color, height, width):
-
+    ini = time.time()
     dicionary = getTotalColors(imagePath)
     total = totalPixelsRemoved
     originalColor = '('+str(color[c][0])+', ' + \
@@ -123,7 +126,8 @@ def removeStrictPercentageColors(imagePath, c, totalPixelsRemoved, image_data, c
             if aux in dicionary[originalColor]:
                 image_data[loop1, loop2] = 255, 255, 255
                 total += 1
-
+    fim = time.time()
+    print('tempo de execucao (qualidade) = ', fim-ini)
     return total
 
 
