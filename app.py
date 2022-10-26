@@ -15,8 +15,8 @@ absolute_path = 0
 
 
 @app.route('/', methods=["GET", "POST"])
-def upload_image():
-    cleaningFiles()
+async def upload_image():
+    await cleaningFiles()
     return render_template('index.html')
 
 
@@ -27,12 +27,12 @@ async def get_color_palette_image():
 
         numbers_of_colors_palette = 8
 
-        colorsByExtColor = colorPaletteByExtColor(
+        colorsByExtColor = await colorPaletteByExtColor(
             image, numbers_of_colors_palette)
 
-        imageInfos = await getImageInfos('static/images/one.jpg')
+        imageInfos = await getImageInfos('static/images/'+filename)
 
-        return {"imageInfos": imageInfos, "colorsByExtColor": colorsByExtColor, "imagePath": "one.jpg"}
+        return {"imageInfos": imageInfos, "colorsByExtColor": colorsByExtColor, "imagePath": str(filename)}
 
     return redirect("/")
 
@@ -46,7 +46,7 @@ async def removeColor():
         colorReceived = list(colorReceived)
         imagePath = request_data['imagePath']
 
-        totalPixelsRemoved = removeSpecificColor(colorReceived, imagePath)
+        totalPixelsRemoved = await removeSpecificColor(colorReceived, imagePath)
 
         imageInfos = await getImageInfos('static/images/response.jpg')
 
