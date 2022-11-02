@@ -98,7 +98,7 @@
   }
 
   .data {
-    color: blueviolet;
+    color: grey;
   }
 
   @media (orientation: landscape) {
@@ -114,29 +114,26 @@
       height: auto;
     }
   }
+
 </style>
 
 <body>
-  <div id="main" style="display: flex; flex-direction: column; align-items: center; padding: 3vmin;">
+  <div id="main" style="display: flex; flex-direction: column; align-items: center; padding: 3vmin; justify-content: center;">
     <h1 id="title"><a href="/">Insira uma imagem</a></h1>
-    <form id="form" method="post" action="/getcolorpalettebyimage" enctype="multipart/form-data">
+
+    <form style="margin: 3vmin 0;" id="form" method="post" action="/getcolorpalettebyimage" enctype="multipart/form-data">
       <input id="inputImage" type="file" name="file" autocomplete="off" required accept="image/jpeg, image/png"
         autofocus>
     </form>
+
     <img id="image" src="" alt="" style="display: none;">
     <img id="imageResult" src="" alt="" style="display: none;">
 
     <h3 id="loadingText" style="display: none;">Processando</h3>
-    <div id="loading" style="display: none; align-items: center; flex-direction: column;">
-      <!-- <h2>Paletas de cores retirada usando o <a href="https://scikit-learn.org/stable/index.html"> Scikit-Learn</a></h2>
-      <div id="colorsByScikit-Learn" class="divColors">
-        mostrando as cores
-      </div>
-      <h2>Paletas de cores retirada usando o <a href="https://lokeshdhakar.com/projects/color-thief/"> Color Thief</a>
-      </h2>
-      <div id="colorsByColorThief" class="divColors">
-        mostrando as cores 
-      </div> -->
+    <div id="loading" style="display: none; align-items: center; flex-direction: column; justify-content: center; text-align: center;">
+      
+      <hr class="hr">
+
       <h4> Total de pixels "removidos" ou modificados: <span class="data" id="totalPixelsRemoved">0</span> px / <span
           class="data" id="totalPixelsRemovedPercent">0</span>%</h4>
       <hr>
@@ -150,15 +147,24 @@
           class="data" id="diffPixelsPercent">0</span>%</h4>
       <h4> Diferença do Tamanho das imagens (em bytes): <span class="data" id="diffBytes">0</span> bytes / <span
           class="data" id="diffBytesPercent">0</span>%</h4>
-      <br>
+      
+      <hr class="hr">
+
       <h2 style="margin-bottom: 0;">Paleta de cores obtida com a porcentagem e código hexadecimal de cada cor:</h2>
-      <p style="margin-top: 0;">(Clique em uma ou mais cores para selecionar e clique em "Processar imagem" para
+      <p style="margin-top: 0;">(Clique em uma ou mais cores para selecionar, selecione um método de remoção de cor e clique em "Processar imagem" para
         remover.)</p>
       <div id="colorsByExtColors" class="divColors">
         <!-- mostrando as cores -->
       </div>
-      <br>
-      <h2>Remover canais de cores(R,G,B):</h2>
+      <select required style="padding: 0.8vmin 2.8vmin; text-align: center; font-weight: bolder;" id="method" class="custom-select custom-select-lg mb-3 mt-3" >
+        <option value="speed">MÉTODO VELOCIDADE</option>
+        <option value="quality">MÉTODO QUALIDADE</option>
+      </select>
+      <h4 id="warningDuration" style="display: none; color: red; font-weight: bolder; margin: 1vmin; width: 100%; margin-top: 0;">Esteja ciente que o método qualidade pode levar vários minutos para processar!</h4>
+      
+      <hr class="hr">
+
+      <h2>Remover canais de cores (R,G,B):</h2>
       <div class="divColors">
         <span class="colorsElement">
           <button id="red" class="channelColor colorsButton" style="background-color: red;"></button>
@@ -174,12 +180,9 @@
         </span>
       </div>
       <hr class="hr">
-      <button class="btn btn-dark btn-block" onclick="sendColorRequest(colorsRequest)">
+      <button style="margin-top: 1.5vmin;" class="btn btn-dark btn-block" onclick="sendColorRequest(colorsRequest)">
         <h3 style="font-size: 4vmin;">Processar imagem</h3>
       </button>
-      <!-- <button class="btn btn-light btn-block" onclick="sendRemoveBg()">
-        <h3 style="font-size: 4vmin;">Remover fundo</h3>
-      </button> -->
     </div>
 
   </div>
@@ -238,6 +241,13 @@
       reader.readAsDataURL(imageInput.files[0]);
     }
   })
+
+  document.getElementById("method").addEventListener("change", e => {
+    if(e.target.value == "quality")
+      document.getElementById("warningDuration").style.display = "unset";
+    else
+      document.getElementById("warningDuration").style.display = "none";
+  });
 
   function showColorPaletteByExtColors(response) {
     let colorsElement = document.getElementById("colorsByExtColors");
@@ -332,11 +342,17 @@
       document.getElementById("loadingText").style.display = "unset";
       document.getElementById("loading").style.display = "none";
 
+      let url = '';
+      if(document.getElementById("method").value == "speed")
+        url = "/removeColorBySpeed";
+      else if(document.getElementById("method").value == "quality")
+        url = "/removeColorByQuality";
+
       let data = {
         'colorsToSend': colorsToSend,
         'imagePath': imagePath
       }
-      axios.post('/removeColor', data)
+      axios.post(url, data)
         .then((response) => {
           imageResponsePath = response.data.imageResponsePath;
           document.getElementById("totalPixelsModifiedImage").innerHTML = response.data.imageInfos.totalPixel;

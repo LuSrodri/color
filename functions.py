@@ -28,7 +28,7 @@ def getPercentagesOfColorsByPixel(pixel_count, colors):
     return percentages
 
 
-async def removeSpecificColor(color, imagePath):
+async def removeSpecificColor(color, imagePath, option):
     await cleaningResponseFile()
     image = Image.open('static/images/'+imagePath).convert('RGB')
     image_data = image.load()
@@ -38,10 +38,12 @@ async def removeSpecificColor(color, imagePath):
     rangePixel = 80
     for c in range(len(color)):
         if (len(color[c]) == 3 and isinstance(color[c][0], int)):
-            totalPixelsRemoved = removeStrictPercentageColors(imagePath,
-                                                              c, totalPixelsRemoved, image_data, color, height, width)
-            # totalPixelsRemoved = removeColorsWithRangeError(c, totalPixelsRemoved,
-            #                                                 image_data, color, height, width, rangePixel)
+            if option == 'quality':
+                totalPixelsRemoved = removeStrictPercentageColors(
+                    imagePath, c, totalPixelsRemoved, image_data, color, height, width)
+            elif option == 'speed':
+                totalPixelsRemoved = removeColorsWithRangeError(
+                    c, totalPixelsRemoved, image_data, color, height, width, rangePixel)
 
         elif (color[c] == 'red'):
             for loop1 in range(height):
