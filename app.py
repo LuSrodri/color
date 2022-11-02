@@ -37,8 +37,8 @@ async def get_color_palette_image():
     return redirect("/")
 
 
-@app.route('/removeColor', methods=["GET", "POST"])
-async def removeColor():
+@app.route('/removeColorBySpeed', methods=["GET", "POST"])
+async def removeColorBySpeed():
     if request.method == "POST":
         request_data = request.get_json()
 
@@ -46,7 +46,25 @@ async def removeColor():
         colorReceived = list(colorReceived)
         imagePath = request_data['imagePath']
 
-        totalPixelsRemoved = await removeSpecificColor(colorReceived, imagePath)
+        totalPixelsRemoved = await removeSpecificColor(colorReceived, imagePath, "speed")
+
+        imageInfos = await getImageInfos('static/images/response.jpg')
+
+        return {"imageInfos": imageInfos, "totalPixelsRemoved": totalPixelsRemoved, "imageResponsePath": "response.jpg"}
+
+    return redirect('/')
+
+
+@app.route('/removeColorByQuality', methods=["GET", "POST"])
+async def removeColorByQuality():
+    if request.method == "POST":
+        request_data = request.get_json()
+
+        colorReceived = request_data['colorsToSend']
+        colorReceived = list(colorReceived)
+        imagePath = request_data['imagePath']
+
+        totalPixelsRemoved = await removeSpecificColor(colorReceived, imagePath, "quality")
 
         imageInfos = await getImageInfos('static/images/response.jpg')
 
