@@ -31,6 +31,7 @@
 
   img {
     margin: 1vmin;
+    margin-top: 0;
     border: solid black 1.5vmin;
     border-radius: 3vmin;
   }
@@ -408,13 +409,13 @@
       document.getElementById("totalPixelsRemoved").innerHTML = 0;
       document.getElementById("totalPixelsRemovedPercent").innerHTML = 0;
       document.getElementById("diffPixelsPercent").innerHTML = 0;
-      document.getElementById("diffPixelsPercent").style.color = "blueviolet";
+      document.getElementById("diffPixelsPercent").style.color = "gray";
       document.getElementById("diffBytesPercent").innerHTML = 0;
-      document.getElementById("diffBytesPercent").style.color = "blueviolet";
+      document.getElementById("diffBytesPercent").style.color = "gray";
       document.getElementById("diffPixels").innerHTML = 0;
-      document.getElementById("diffPixels").style.color = "blueviolet";
+      document.getElementById("diffPixels").style.color = "gray";
       document.getElementById("diffBytes").innerHTML = 0;
-      document.getElementById("diffBytes").style.color = "blueviolet";
+      document.getElementById("diffBytes").style.color = "gray";
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }

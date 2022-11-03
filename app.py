@@ -1,10 +1,8 @@
 from http.client import BAD_REQUEST
-import json
 from werkzeug.utils import secure_filename
 from flask import Flask, Response, render_template, request, redirect, send_file
 import os
 from functions import *
-from requests_toolbelt import MultipartEncoder
 
 app = Flask(__name__)
 
